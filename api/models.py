@@ -47,7 +47,8 @@ class User(models.Model):
 class Object(models.Model):
     name = models.CharField(max_length=100)
     address = models.TextField()
-
+    description = models.TextField(blank=True, null=True)
+    
     def __str__(self):
         return self.name
 
