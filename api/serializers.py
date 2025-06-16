@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Role, Right, RoleRight, User, Object, JobTitle, Employee,
+    Role, Right, RoleRight, CustomUser, Object, JobTitle, Employee,
     ClientsApplication, ClientsApplicationType, ClientsApplicationStatus,
     WorkTimeTracking, Material
 )
@@ -28,16 +28,16 @@ class RoleRightSerializer(serializers.ModelSerializer):
         fields = ['id', 'role', 'right', 'role_id', 'right_id']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['id', 'login', 'password', 'role']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = User(**validated_data)
+        user = CustomUser(**validated_data)
         user.password = password
         user.save()
         return user
@@ -63,11 +63,11 @@ class JobTitleSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     jobTitle = JobTitleSerializer(read_only=True)
     object = ObjectSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     jobTitle_id = serializers.PrimaryKeyRelatedField(queryset=JobTitle.objects.all(), source='jobTitle', write_only=True)
     object_id = serializers.PrimaryKeyRelatedField(queryset=Object.objects.all(), source='object', write_only=True)
-    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='user', write_only=True, allow_null=True, required=False)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), source='user', write_only=True, allow_null=True, required=False)
 
     class Meta:
         model = Employee

@@ -25,9 +25,9 @@ class RoleRight(models.Model):
     def __str__(self):
         return f"{self.role.name} - {self.right.action}"
 
-class User(models.Model):
+class CustomUser(models.Model):
     login = models.CharField(max_length=100, unique=True)
-    _password = models.CharField(max_length=128, db_column='password')  # Хранит хеш пароля
+    _password = models.CharField(max_length=128, db_column='password')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
     @property
@@ -40,6 +40,12 @@ class User(models.Model):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self._password)
+
+    def save(self, *args, **kwargs):
+    # Если пароль был изменён и не хеширован
+        if self._password and not self._password.startswith('pbkdf2_'):
+            self.password = self._password  # Вызовет @password.setter
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.login
@@ -67,7 +73,7 @@ class Employee(models.Model):
     passport = models.TextField()
     jobTitle = models.ForeignKey(JobTitle, on_delete=models.SET_NULL, null=True)
     object = models.ForeignKey(Object, on_delete=models.SET_NULL, null=True)
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.fullName
