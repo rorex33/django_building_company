@@ -1,45 +1,54 @@
 from rest_framework import serializers
 from .models import (
-    Role, Right, RoleRight, CustomUser, Object, JobTitle, Employee,
-    ClientsApplication, ClientsApplicationType, ClientsApplicationStatus,
-    WorkTimeTracking, Material
+    CustomUser, 
+    Employee,
+    JobTitle,
+    Object,
+    Material,
+    ClientsApplicationType,
+    ClientsApplicationStatus, 
+    ClientsApplication, 
+    WorkTimeTracking,
+    Role
 )
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = '__all__'
 
-
-class RightSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Right
-        fields = '__all__'
-
-
-class RoleRightSerializer(serializers.ModelSerializer):
-    role = RoleSerializer(read_only=True)
-    right = RightSerializer(read_only=True)
-    role_id = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), source='role', write_only=True)
-    right_id = serializers.PrimaryKeyRelatedField(queryset=Right.objects.all(), source='right', write_only=True)
-
-    class Meta:
-        model = RoleRight
-        fields = ['id', 'role', 'right', 'role_id', 'right_id']
-
+### ПОЛЬЗОВАТЕЛИ ###
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    role = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
+
         fields = ['id', 'login', 'password', 'role']
+        extra_kwargs = {
+            'role': {'write_only': True}  # Скрываем в ответе
+        }
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Пароль должен содержать минимум 8 символов")
+        return value
+
+    def validate_role(self, value):
+        """Проверяем существование роли"""
+        if not Role.objects.filter(name=value).exists():
+            raise serializers.ValidationError("Роль с таким названием не существует")
+        return value
 
     def create(self, validated_data):
+        # Получаем объект роли по названию
+        role_name = validated_data.pop('role')
+        role = Role.objects.get(name=role_name)
+        
+        # Создаем пользователя
         password = validated_data.pop('password')
-        user = CustomUser(**validated_data)
-        user.password = password
+        user = CustomUser(**validated_data, role=role)
+        user.password = password  # Автоматическое хеширование через setter
         user.save()
+
         return user
 
     def update(self, instance, validated_data):
@@ -48,72 +57,204 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class ObjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Object
-        fields = '__all__'
-
-
-class JobTitleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobTitle
-        fields = '__all__'
-
+### СОТРУДНИКИ ###
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    jobTitle = JobTitleSerializer(read_only=True)
-    object = ObjectSerializer(read_only=True)
-    user = CustomUserSerializer(read_only=True)
-
-    jobTitle_id = serializers.PrimaryKeyRelatedField(queryset=JobTitle.objects.all(), source='jobTitle', write_only=True)
-    object_id = serializers.PrimaryKeyRelatedField(queryset=Object.objects.all(), source='object', write_only=True)
-    user_id = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), source='user', write_only=True, allow_null=True, required=False)
-
+    jobTitle = serializers.CharField(write_only=True)
+    object = serializers.CharField(write_only=True)
+    user = serializers.CharField(write_only=True, required=False, allow_null=True)
+    
     class Meta:
         model = Employee
         fields = [
             'id', 'fullName', 'personnelNumber', 'phoneNumber', 'email',
-            'bankDetails', 'passport', 'jobTitle', 'object', 'user',
-            'jobTitle_id', 'object_id', 'user_id'
+            'bankDetails', 'passport', 'jobTitle', 'object', 'user'
         ]
+    
+    def validate_personnelNumber(self, value):
+        if Employee.objects.filter(personnelNumber=value).exists():
+            raise serializers.ValidationError("Сотрудник с таким табельным номером уже существует.")
+        return value
 
+    def validate_user(self, value):
+        if not value:
+            return None
+        try:
+            user = CustomUser.objects.get(login=value)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError("Пользователь с таким логином не найден.")
+        if Employee.objects.filter(user=user).exists():
+            raise serializers.ValidationError("Пользователь уже привязан к другому сотруднику.")
+        return user
+
+    def validate_jobTitle(self, value):
+        from .models import JobTitle
+        try:
+            return JobTitle.objects.get(name=value)
+        except JobTitle.DoesNotExist:
+            raise serializers.ValidationError("Должность с таким названием не найдена.")
+
+    def validate_object(self, value):
+        from .models import Object
+        try:
+            return Object.objects.get(name=value)
+        except Object.DoesNotExist:
+            raise serializers.ValidationError("Объект с таким названием не найден.")
+
+    def create(self, validated_data):
+        user = validated_data.pop('user', None)
+        job_title = validated_data.pop('jobTitle')
+        obj = validated_data.pop('object')
+
+        employee = Employee.objects.create(
+            user=user,
+            jobTitle=job_title,
+            object=obj,
+            **validated_data
+        )
+        return employee
+
+
+### ДОЛЖНОСТИ ###
+
+class JobTitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobTitle
+        fields = ['id', 'name']
+
+    def validate_name(self, value):
+        if JobTitle.objects.filter(name=value).exists():
+            raise serializers.ValidationError("Должность с таким названием уже существует.")
+        return value
+
+
+### ОБЪЕКТЫ ###
+
+class ObjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Object
+        fields = ['id', 'name', 'address', 'description']
+
+    def validate_name(self, value):
+        if Object.objects.filter(name=value).exists():
+            raise serializers.ValidationError("Объект с таким названием уже существует.")
+        return value
+
+
+### МАТЕРИАЛЫ ###
+
+class MaterialSerializer(serializers.ModelSerializer):
+    object = serializers.CharField(write_only=True)
+    object_data = ObjectSerializer(source='object', read_only=True)
+
+    class Meta:
+        model = Material
+        fields = ['id', 'name', 'amount', 'object', 'object_data']
+
+    def validate_object(self, value):
+        try:
+            return Object.objects.get(name=value)
+        except Object.DoesNotExist:
+            raise serializers.ValidationError("Объект с таким названием не найден.")
+
+
+### ЗАЯВКИ ###
 
 class ClientsApplicationTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientsApplicationType
-        fields = '__all__'
-
+        fields = ['id', 'name', 'description']
 
 class ClientsApplicationStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientsApplicationStatus
-        fields = '__all__'
-
+        fields = ['id', 'name', 'description']
 
 class ClientsApplicationSerializer(serializers.ModelSerializer):
     type = ClientsApplicationTypeSerializer(read_only=True)
     status = ClientsApplicationStatusSerializer(read_only=True)
-    type_id = serializers.PrimaryKeyRelatedField(queryset=ClientsApplicationType.objects.all(), source='type', write_only=True)
-    status_id = serializers.PrimaryKeyRelatedField(queryset=ClientsApplicationStatus.objects.all(), source='status', write_only=True)
+    
+    type_name = serializers.SlugRelatedField(
+        queryset=ClientsApplicationType.objects.all(),
+        slug_field='name',
+        source='type',
+        write_only=True
+    )
+    status_name = serializers.SlugRelatedField(
+        queryset=ClientsApplicationStatus.objects.all(),
+        slug_field='name',
+        source='status',
+        write_only=True
+    )
 
     class Meta:
         model = ClientsApplication
-        fields = ['id', 'fullName', 'phoneNumber', 'description', 'date', 'type', 'status', 'type_id', 'status_id']
+        fields = [
+            'id', 'fullName', 'phoneNumber', 'description', 
+            'date', 'type', 'status', 'type_name', 'status_name'
+        ]
 
+
+### WTT ###
 
 class WorkTimeTrackingSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
-    employee_id = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), source='employee', write_only=True)
+    personnelNumber = serializers.CharField(write_only=True)
 
     class Meta:
         model = WorkTimeTracking
-        fields = ['id', 'employee', 'employee_id', 'date', 'startTime', 'endTime']
+        fields = ['id', 'employee', 'personnelNumber', 'date', 'startTime', 'endTime']
+
+    def validate(self, data):
+        start = data.get('startTime') or self.instance.startTime if self.instance else None
+        end = data.get('endTime') or self.instance.endTime if self.instance else None
+
+        if start and end and start > end:
+            raise serializers.ValidationError("startTime не может быть позже endTime")
+        return data
+
+    def create(self, validated_data):
+        personnel_number = validated_data.pop('personnelNumber')
+        employee = Employee.objects.get(personnelNumber=personnel_number)
+        return WorkTimeTracking.objects.create(employee=employee, **validated_data)
+
+    def update(self, instance, validated_data):
+        if 'date' in validated_data:
+            raise serializers.ValidationError({"date": "Изменение даты не разрешено"})
+        validated_data.pop('personnelNumber', None)
+        return super().update(instance, validated_data)
+
+class StartWorkSerializer(serializers.Serializer):
+    personnelNumber = serializers.CharField()
+
+    def validate_personnelNumber(self, value):
+        try:
+            return Employee.objects.get(personnelNumber=value)
+        except Employee.DoesNotExist:
+            raise serializers.ValidationError("Сотрудник с таким табельным номером не найден")
+
+class EndWorkSerializer(serializers.Serializer):
+    personnelNumber = serializers.CharField()
+
+    def validate_personnelNumber(self, value):
+        try:
+            return Employee.objects.get(personnelNumber=value)
+        except Employee.DoesNotExist:
+            raise serializers.ValidationError("Сотрудник с таким табельным номером не найден")
 
 
-class MaterialSerializer(serializers.ModelSerializer):
-    object = ObjectSerializer(read_only=True)
-    object_id = serializers.PrimaryKeyRelatedField(queryset=Object.objects.all(), source='object', write_only=True)
+### Роли ###
 
+class RoleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Material
-        fields = ['id', 'name', 'amount', 'object', 'object_id']
+        model = Role
+        fields = ['id', 'name', 'description']
+
+    def validate_name(self, value):
+        # Проверяем уникальность для create и update
+        qs = Role.objects.filter(name=value)
+        if self.instance:
+            qs = qs.exclude(id=self.instance.id)
+        if qs.exists():
+            raise serializers.ValidationError("Роль с таким названием уже существует.")
+        return value

@@ -8,23 +8,6 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
-class Right(models.Model):
-    action = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.action
-
-class RoleRight(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    right = models.ForeignKey(Right, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('role', 'right')
-
-    def __str__(self):
-        return f"{self.role.name} - {self.right.action}"
-
 class CustomUser(models.Model):
     login = models.CharField(max_length=100, unique=True)
     _password = models.CharField(max_length=128, db_column='password')
@@ -107,7 +90,7 @@ class WorkTimeTracking(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     date = models.DateField()
     startTime = models.TimeField()
-    endTime = models.TimeField()
+    endTime = models.TimeField(null=True)
 
     def __str__(self):
         return f"{self.employee.fullName} - {self.date}"
