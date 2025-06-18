@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Компания Darwin</title>
+      <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+
+  <body>
+    
+    <div class="header">
+      <img src="{% static 'images/companyLogo.png' %}" alt="Logo" class="logo">
+      <div>
+        <div class="textTitle">Darwin</div>
+        <div class="textAccent">надежность в каждом решении</div>
+      </div>
+      <a href="/pages/auth/" class="btn btnAccent btnAccentHeader">Для сотрудников</a>
+    </div>
+
+    <div class="container containerColumnContent">
+      <div class="box">
+        <h1 class="textTitle">О компании</h1>
+        <p class="section-text">Мы — компания <strong>Darwin</strong>, предоставляющая полный спектр услуг для строительного сектора.</p>
+        &nbsp
+        <p class="section-text">Наша цель — повысить эффективность строительства с помощью современных информационных решений.</p>
+      </div>
+
+      <div class="box">
+        <h2 class="textTitle">Наши услуги</h2>
+        <p>Разработка проекта под ключ<p>
+        &nbsp
+        <p>Интеграция IoT в жилые дома<p>
+        &nbsp
+        <p>Дизайн проекты для объектов<p>
+        &nbsp
+        <p>Закупка материалов у надежных производителей</p>
+      </div>
+
+      <div class="box">
+        <h2 class="textTitle">Оставьте заявку — мы перезвоним</h2>
+        <form id="login-form">
+          <input type="text" id="name" placeholder="Ваше имя" required />
+          <input type="tel" id="phoneNumber" placeholder="Номер телефона" required />
+          <input type="text" id="message" placeholder="Сообщение" required />
+          <div class="btn-group">
+            <button type="submit" class="btn btnAccent">Отправить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </body>
+
+</html>

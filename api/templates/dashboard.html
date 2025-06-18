@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Личный кабинет - ИС Darwin</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+
+  <body>
+
+    <div class="header">
+      <div>
+        <div class="textTitle">Курочкин Е.М.</div>
+        <div class="textAccent">администратор</div>
+      </div>
+      <a href="/pages/index/" class="btn btnAccent btnAccentHeader">Перейти на сайт компании</a>
+    </div>
+
+    <div class="container">
+      <div class="box">
+        <h2 class="textTitle">Добро пожаловать!</h2>
+        <div class="btnGroup">
+          <a href="/pages/users/" class="btn">Пользователи ИС</a>
+          <a href="/pages/roles/" class="btn">Роли ИС</a>
+          <a href="/pages/employeers/" class="btn">Сотрудники компании</a>
+          <a href="/pages/objects/" class="btn">Рабочие объекты</a>
+          <a href="/materials" class="btn">Материалы</a>
+          <a href="/pages/timeTracker/" class="btn">Учет рабочего времени</a>
+          <a href="/pages/clientsApplications/" class="btn">Заявки клиентов</a>
+          <a href="/pages/clientsApplicationsTypes/" class="btn">Типы заявок</a>
+          <a href="/pages/clientsApplicationsStatuses/" class="btn">Статусы заявок</a>
+          <a href="/pages/auth/" class="btn btnAccentRed">Выйти из ИС</a>
+        </div>
+      </div>
+    </div>
+
+  </body>
+
+</html>

@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Материалы - ИС Darwin</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+
+  <body>
+
+    <div class="header">
+      <div>
+        <div class="textTitle">Курочкин Е.М.</div>
+        <div class="textAccent">администратор</div>
+      </div>
+      <a href="/pages/index/" class="btn btnAccent btnAccentHeader">Перейти на сайт компании</a>
+    </div>
+
+    <div class="container">
+      <div class="box">
+        <h2 class="textTitle">Материалы</h2>
+        <div class="btnGroup">
+          <button class="btn">Добавить материал</button>
+          <button class="btn">Изменить материал</button>
+          <button class="btn btnAccentRed">Удалить материал</button>
+          <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="container">
+        <h2 class="textTitle">Список материалов</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>name</th>
+              <th>amount</th>
+              <th>objectId</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <!-- сервер? -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </body>
+
+</html>

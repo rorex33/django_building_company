@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.shortcuts import redirect
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -22,7 +23,10 @@ from .views import (
 
     # Импорт служебной логики
     LoginAPIView, 
-    LogoutAPIView
+    LogoutAPIView,
+    CheckLoginAPIView,
+
+    RenderPageAPIView
 )
 
 # Настройка роутера
@@ -39,6 +43,9 @@ router.register(r'roles', RoleViewSet, basename='role')
 
 # URL паттерны
 urlpatterns = [
+    path('', lambda request: redirect('pages/index/', permanent=False)),
+
+    path('pages/<str:page_name>/', RenderPageAPIView.as_view(), name='render_page_api'),
 
     # Роутер
     path('api/', include(router.urls)),
@@ -46,7 +53,8 @@ urlpatterns = [
     # Служебное
     path('api/login/', LoginAPIView.as_view(), name='login'),
     path('api/logout/', LogoutAPIView.as_view(), name='logout'),
-
+    path('api/check-login/', CheckLoginAPIView.as_view(), name='check-login'),
+    
     # WTT
     path('api/wtt/start/', StartWorkAPIView.as_view()),
     path('api/wtt/stop/', EndWorkAPIView.as_view()),

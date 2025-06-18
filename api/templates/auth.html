@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Авторизация - ИС Darwin</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+  
+  <body>
+
+    <div class="header">
+      <img src="{% static 'images/companyLogo.png' %}" alt="Logo" class="logo">
+      <div>
+        <div class="textTitle">Darwin</div>
+        <div class="textAccent">надежность в каждом решении</div>
+      </div>
+      <a href="/pages/index/" class="btn btnAccent btnAccentHeader">Перейти на сайт компании</a>
+    </div>
+
+    <div class="container">
+      <div class="box">
+        <h2 class="textTitle">Вход в систему</h2>
+        <form id="login-form">
+          <input type="text" id="login" placeholder="Логин" required />
+          <input type="password" id="password" placeholder="Пароль" required />
+          <div class="btnGroup">
+            <button type="submit" class="btn">Войти</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="error-modal" class="modal hidden">
+      <div class="modalBox">
+        <p>Неверный логин или пароль</p>
+        <button class="btn btnAccentRed" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <script src="{% static 'js/login.js' %}"></script>
+  </body>
+
+</html>

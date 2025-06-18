@@ -1,14 +1,14 @@
+from django.shortcuts import render
 from django.http import JsonResponse
-from django.utils.decorators import method_decorator
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission
 
-from functools import wraps
 from datetime import date, datetime
 
 from .models import (
@@ -39,6 +39,101 @@ from .serializers import (
     RoleSerializer,
 )
 
+##### FRONTEND #####
+
+# Конфигурация страниц: шаблон + роли (None = открытая страница)
+PAGE_CONFIG = {
+    'index': {
+        'template': 'index.html',
+        'auth_required': False,  # не требует авторизации
+    },
+    'auth': {
+        'template': 'auth.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'clientsApplications': {
+        'template': 'clientsApplications.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'clientsApplicationsStatuses': {
+        'template': 'clientsApplicationsStatuses.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'clientsApplicationsTypes': {
+        'template': 'clientsApplicationsTypes.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'dashboard': {
+        'template': 'dashboard.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'employeers': {
+        'template': 'employeers.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'materials': {
+        'template': 'materials.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'objects': {
+        'template': 'objects.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'roles': {
+        'template': 'roles.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'timeTracker': {
+        'template': 'timeTracker.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+    'users': {
+        'template': 'users.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
+}
+
+# Рендер страниц
+class RenderPageAPIView(APIView):
+    permission_classes = []  # динамически назначаются
+
+    def get_permissions(self):
+        page_name = self.kwargs.get('page_name')
+        config = PAGE_CONFIG.get(page_name)
+
+        if not config:
+            return [AllowAny()]  # Страница не найдена — пусть get обработает
+
+        if not config.get('auth_required', False):
+            return [AllowAny()]  # Страница доступна без авторизации
+
+        # Если авторизация требуется — проверяем и роль (если указана)
+        permissions = [IsSessionAuthenticated()]
+        if 'roles' in config:
+            permissions.append(roleRequiredPermissionFactory(config['roles'])())
+        return permissions
+
+    def get(self, request, page_name):
+        config = PAGE_CONFIG.get(page_name)
+        if not config:
+            return HttpResponseNotFound("Page not found")
+
+        return render(request, config['template'])
+
+
+
+##### BACKEND #####
 
 ### СЛУЖЕБНОЕ ###
 
@@ -55,6 +150,15 @@ class IsSessionAuthenticated(BasePermission):
             return True
         except CustomUser.DoesNotExist:
             return False
+
+# Ответ о логине для фронта
+class CheckLoginAPIView(APIView):
+    permission_classes = [IsSessionAuthenticated]  # Используем ваш кастомный пермишен
+
+    def post(self, request):
+        # Если пермишен прошел, значит пользователь аутентифицирован
+        return Response({'logged_in': True})
+
 
 # Проверка доступа по роли
 def roleRequiredPermissionFactory(allowed_roles):

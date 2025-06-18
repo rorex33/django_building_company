@@ -1,0 +1,233 @@
+:root {
+  --primary-color: #007BFF;
+  --primary-hover-color: #0056b3;
+  --accent-color: #FFA500;
+  --accent-hover-color: #e69500;
+  --success-color: #28A745;
+  --red-color: #DC3545;
+  --red-hover-color: #b52a3a;
+  --white-color: #F8F9FA;
+  --black-color: #212529;
+  --gray-color: #ccc;
+  --blur-color: rgba(0, 0, 0, 0.5);
+
+  --border-radius: 12px;
+
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-header: rgba(0, 0, 0, 0.05);
+
+  --font-size-title-large: 24px;
+  --font-size-title-medium: 18px;
+  --font-size-text: 16px;
+  --font-size-subtext: 14px;
+  --font-size-caption: 12px;
+
+  --padding-page-vertical: 20px;
+  --padding-page-horizontal: 40px;
+  --padding-container: 40px;
+  --padding-input: 12px;
+  --margin-small: 10px;
+  --margin-medium: 16px;
+  --margin-large: 24px;
+  --gap-small: 10px;
+  --gap-medium: 16px;
+  --gap-large: 24px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--white-color);
+  color: var(--black-color);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  width: 100%;
+  padding: var(--padding-input);
+  margin-bottom: var(--margin-medium);
+  border: 1px solid var(--gray-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-text);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.textTitle {
+  font-size: var(--font-size-title-medium);
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.textAccent {
+  font-size: var(--font-size-subtext);
+  color: var(--accent-color);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--padding-page-vertical) var(--padding-page-horizontal);
+  background-color: var(--white-color);
+  box-shadow: 0 2px 4px var(--shadow-header);
+  position: relative;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: scale-down;
+  margin-right: var(--margin-medium);
+}
+
+.btn {
+  padding: var(--padding-input);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  color: var(--white-color);
+  background-color: var(--primary-color);
+}
+
+.btn:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.btnAccent {
+  background-color: var(--accent-color);
+  font-size: var(--font-size-text);
+  width: 100%;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnAccent:hover {
+  background-color: var(--accent-hover-color);
+}
+
+.btnAccentHeader {
+  position: static;
+  margin-left: auto;
+  width: auto;
+}
+
+.btnAccentRed {
+  background-color: var(--red-color);
+  font-size: var(--font-size-text);
+}
+
+.btnAccentRed:hover {
+  background-color: var(--red-hover-color);
+}
+
+.btnGroup {
+  display: flex;
+  gap: var(--gap-small);
+  flex-direction: column;
+}
+
+.box {
+  background-color: var(--white-color);
+  padding: var(--padding-container);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 20px var(--shadow-light);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+
+}
+
+.box h2 {
+  margin-bottom: var(--margin-medium);
+}
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-container);
+}
+
+.containerColumnContent {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-large);
+  text-align: center;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--blur-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modalBox {
+  background: var(--white-color);
+  padding: 20px 30px;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+  min-width: 250px;
+}
+
+.hidden {
+  display: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-text);
+  margin-top: var(--margin-medium);
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--gray-color);
+  padding: 12px;
+  text-align: left;
+}
+
+.table thead th {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  font-weight: bold;
+}
+
+.table tbody tr:hover {
+  background-color: var(--shadow-light);
+  cursor: pointer;
+}
