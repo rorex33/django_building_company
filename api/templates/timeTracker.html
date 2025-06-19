@@ -23,9 +23,9 @@
       <div class="box">
         <h2 class="textTitle">Учет рабочего времени</h2>
         <div class="btnGroup">
-          <button class="btn">Начать рабочий день</button>
-          <button class="btn">Завершить рабочий день</button>
-          <button class="btn btnAccentRed">Изменить данные</button>
+          <button id="startBtn" class="btn">Начать рабочий день</button>
+          <button id="endBtn" class="btn">Завершить рабочий день</button>
+          <button id="btnOpenEdit" class="btn btnAccentRed">Изменить данные</button>
           <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
         </div>
       </div>
@@ -44,7 +44,7 @@
               <th>endTime</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="timeTracker-table-body">
             <tr>
               <!-- сервер? -->
             </tr>
@@ -53,6 +53,36 @@
       </div>
     </div>
 
+    <div id="timeTrackerChangeForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Изменить рабочее время</h2>
+        <input type="text" id="employeeId" placeholder="Имя работника" required />
+        <input type="date" id="date" placeholder="Дата смены" required />
+        <input type="time" id="startTime" placeholder="Время начала смены" required />
+        <input type="time" id="endTime" placeholder="Время конца смены" required />
+        <div class="btnGroup">
+          <button type="submit" class="btn btnAccent">Изменить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button> 
+        </div>
+      </div>
+    </div>
+
+    <div id="timeTrackerErrorModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Возникла ошибка. Уточните подробности у системного администратора</p>
+        <button class="btn btnAccentRed" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="timeTrackerSuccessModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Успешно!</p>
+        <button class="btn btnAccentSuccess" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <script src="{% static 'js/timeTrackerLogic.js' %}"></script>
+    <script src="{% static 'js/timeTrackerList.js' %}"></script>
   </body>
 
 </html>
