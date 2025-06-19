@@ -17,7 +17,7 @@ from .models import (
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    role = serializers.CharField(write_only=True)
+    role = serializers.CharField(write_only=False)
 
     class Meta:
         model = CustomUser
@@ -60,18 +60,21 @@ class CustomUserSerializer(serializers.ModelSerializer):
 ### СОТРУДНИКИ ###
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    jobTitle = serializers.CharField(write_only=True)
-    object = serializers.CharField(write_only=True)
-    user = serializers.CharField(write_only=True, required=False, allow_null=True)
-    
+    jobTitle = serializers.CharField(write_only=False, required=False)
+    object = serializers.CharField(write_only=False, required=False)
+    user = serializers.CharField(write_only=False, required=False, allow_null=True, allow_blank=True)
+
     class Meta:
         model = Employee
         fields = [
             'id', 'fullName', 'personnelNumber', 'phoneNumber', 'email',
             'bankDetails', 'passport', 'jobTitle', 'object', 'user'
         ]
-    
+
     def validate_personnelNumber(self, value):
+        # Проверка только при создании или если поле обновляется
+        if self.instance and self.instance.personnelNumber == value:
+            return value
         if Employee.objects.filter(personnelNumber=value).exists():
             raise serializers.ValidationError("Сотрудник с таким табельным номером уже существует.")
         return value
@@ -83,6 +86,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
             user = CustomUser.objects.get(login=value)
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("Пользователь с таким логином не найден.")
+        if self.instance and self.instance.user == user:
+            return user
         if Employee.objects.filter(user=user).exists():
             raise serializers.ValidationError("Пользователь уже привязан к другому сотруднику.")
         return user
@@ -105,14 +110,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user = validated_data.pop('user', None)
         job_title = validated_data.pop('jobTitle')
         obj = validated_data.pop('object')
-
-        employee = Employee.objects.create(
+        return Employee.objects.create(
             user=user,
             jobTitle=job_title,
             object=obj,
             **validated_data
         )
-        return employee
 
 
 ### ДОЛЖНОСТИ ###
@@ -136,7 +139,9 @@ class ObjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'address', 'description']
 
     def validate_name(self, value):
-        if Object.objects.filter(name=value).exists():
+        # При редактировании: исключаем текущий объект из фильтра
+        object_id = self.instance.id if self.instance else None
+        if Object.objects.filter(name=value).exclude(id=object_id).exists():
             raise serializers.ValidationError("Объект с таким названием уже существует.")
         return value
 
@@ -144,19 +149,15 @@ class ObjectSerializer(serializers.ModelSerializer):
 ### МАТЕРИАЛЫ ###
 
 class MaterialSerializer(serializers.ModelSerializer):
-    object = serializers.CharField(write_only=True)
+    object = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Object.objects.all()
+    )
     object_data = ObjectSerializer(source='object', read_only=True)
 
     class Meta:
         model = Material
         fields = ['id', 'name', 'amount', 'object', 'object_data']
-
-    def validate_object(self, value):
-        try:
-            return Object.objects.get(name=value)
-        except Object.DoesNotExist:
-            raise serializers.ValidationError("Объект с таким названием не найден.")
-
 
 ### ЗАЯВКИ ###
 
@@ -178,13 +179,15 @@ class ClientsApplicationSerializer(serializers.ModelSerializer):
         queryset=ClientsApplicationType.objects.all(),
         slug_field='name',
         source='type',
-        write_only=True
+        write_only=True,
+        required=False
     )
     status_name = serializers.SlugRelatedField(
         queryset=ClientsApplicationStatus.objects.all(),
         slug_field='name',
         source='status',
-        write_only=True
+        write_only=True,
+        required=False
     )
 
     class Meta:

@@ -4,12 +4,15 @@
   --accent-color: #FFA500;
   --accent-hover-color: #e69500;
   --success-color: #28A745;
+  --success-hover-color: #218838;
   --red-color: #DC3545;
   --red-hover-color: #b52a3a;
   --white-color: #F8F9FA;
   --black-color: #212529;
   --gray-color: #ccc;
   --blur-color: rgba(0, 0, 0, 0.5);
+  --total-white-color: white;
+  --selected-color: #89b9e9;
 
   --border-radius: 12px;
 
@@ -61,6 +64,24 @@ input {
 input:focus {
   outline: none;
   border-color: var(--primary-color);
+}
+
+select {
+  width: 100%;
+  padding: var(--padding-input);
+  margin-bottom: var(--margin-medium);
+  border: 1px solid var(--gray-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-text);
+  background-color: var(--total-white-color);
+}
+
+select:invalid {
+  color: var(--blur-color);
+}
+
+select option {
+  color: var(--black-color);
 }
 
 a {
@@ -140,6 +161,15 @@ a {
 
 .btnAccentRed:hover {
   background-color: var(--red-hover-color);
+}
+
+.btnAccentSuccess {
+  background-color: var(--success-color);
+  font-size: var(--font-size-text);
+}
+
+.btnAccentSuccess:hover {
+  background-color: var(--success-hover-color);
 }
 
 .btnGroup {
@@ -230,4 +260,18 @@ a {
 .table tbody tr:hover {
   background-color: var(--shadow-light);
   cursor: pointer;
+}
+
+/*added*/
+
+.selected {
+  background-color: var(--selected-color);
+}
+
+.forms {
+  width: 100%;
+  padding: var(--padding-input);
+  margin-bottom: var(--margin-medium);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-text);
 }

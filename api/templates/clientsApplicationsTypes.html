@@ -23,9 +23,9 @@
       <div class="box">
         <h2 class="textTitle">Типы заявок</h2>
         <div class="btnGroup">
-          <button class="btn">Добавить тип</button>
-          <button class="btn">Изменить тип</button>
-          <button class="btn btnAccentRed">Удалить тип</button>
+          <button id="btnAdd" class="btn">Добавить тип</button>
+          <button id="btnOpenEdit" class="btn">Изменить тип</button>
+          <button id="deleteSubmitBtn" class="btn btnAccentRed">Удалить тип</button>
           <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
         </div>
       </div>
@@ -42,15 +42,69 @@
               <th>description</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="application-types-table-body">
             <tr>
-              <!-- сервер? -->
+              <!-- сервер -->
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
+    <div id="clientsApplicationsTypesAddForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Добавить тип</h2>
+        <input type="text" id="addName" placeholder="Название" required />
+        <input type="text" id="addDescription" placeholder="Описание" required />
+        <div class="btnGroup">
+          <button type="submit" class="btn btnAccentSuccess">Добавить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>     
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsTypesChangeForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Изменить тип</h2>
+        <input type="hidden" id="id" />
+        <input type="text" id="editName" placeholder="Название" required />
+        <input type="text" id="editDescription" placeholder="Описание" required />
+        <div class="btnGroup">
+          <button type="submit" class="btn btnAccent">Изменить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsTypesDeleteForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Удалить тип</h2>
+        <div class="forms">
+          <p>Название: <strong id="deleteTypeName"></strong></p>
+        </div>
+        <div class="btnGroup">
+          <button type="button" class="btn btnAccentRed" id="confirmDeleteBtn">Удалить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>          
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsTypesErrorModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Возникла ошибка. Уточните подробности у системного администратора</p>
+        <button class="btn btnAccentRed" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsTypesSuccessModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Успешно!</p>
+        <button class="btn btnAccentSuccess" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <script src="{% static 'js/applicationsTypesLogic.js' %}"></script>
+    <script src="{% static 'js/applicationsTypesList.js' %}"></script>
   </body>
 
 </html>

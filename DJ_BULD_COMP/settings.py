@@ -25,6 +25,12 @@ SECRET_KEY = 'django-insecure-5x3o(u0^9w@$-%3wvol*-p941uwi-5(*9m6l^=7n$3_8&@vxnb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'Lax'  # Или 'None' если проблемы с кросс-доменными запросами
+
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
@@ -53,8 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'django.contrib.sessions.middleware.SessionMiddleware',
 ]
 
 ROOT_URLCONF = 'DJ_BULD_COMP.urls'

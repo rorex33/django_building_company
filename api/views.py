@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseNotFound
+from django.core.exceptions import ValidationError
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -102,6 +103,11 @@ PAGE_CONFIG = {
         'auth_required': False,
         #'roles': ['admin', 'hr', 'basic'],
     },
+    'jobTitles': {
+        'template': 'jobTitles.html',
+        'auth_required': False,
+        #'roles': ['admin', 'hr', 'basic'],
+    },
 }
 
 # Рендер страниц
@@ -155,7 +161,7 @@ class IsSessionAuthenticated(BasePermission):
 class CheckLoginAPIView(APIView):
     permission_classes = [IsSessionAuthenticated]  # Используем ваш кастомный пермишен
 
-    def post(self, request):
+    def get(self, request):
         # Если пермишен прошел, значит пользователь аутентифицирован
         return Response({'logged_in': True})
 
@@ -255,7 +261,7 @@ class UserViewSet(viewsets.ModelViewSet):
 ### СОТРУДНИКИ ###
 
 class EmployeeViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsSessionAuthenticated, roleRequiredPermissionFactory(['admin, hr'])]
+    permission_classes = [IsSessionAuthenticated, roleRequiredPermissionFactory(['admin', 'hr'])]
 
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -287,19 +293,20 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             validated_data = serializer.validated_data
 
-            # Обновление связанных объектов с вашей логикой
-            if 'jobTitle' in validated_data:
-                job_title = serializer.validate_jobTitle(validated_data.pop('jobTitle'))
+            # Обновляем только то, что пришло
+            if 'jobTitle' in request.data:
+                job_title = serializer.validate_jobTitle(request.data.get('jobTitle'))
                 employee.jobTitle = job_title
 
-            if 'object' in validated_data:
-                obj = serializer.validate_object(validated_data.pop('object'))
+            if 'object' in request.data:
+                obj = serializer.validate_object(request.data.get('object'))
                 employee.object = obj
 
-            if 'user' in validated_data:
-                user = serializer.validate_user(validated_data.pop('user'))
+            if 'user' in request.data:
+                user = serializer.validate_user(request.data.get('user'))
                 employee.user = user
 
+            # Обновление остальных полей
             serializer.update(employee, validated_data)
             employee.save()
 
@@ -472,12 +479,37 @@ class ClientsApplicationViewSet(viewsets.ModelViewSet):
     queryset = ClientsApplication.objects.all()
     serializer_class = ClientsApplicationSerializer
 
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            # Создание заявки доступно всем
+            return [AllowAny()]
+        # Остальные действия — только для авторизованных с ролями
+        return [IsSessionAuthenticated(), roleRequiredPermissionFactory(['admin', 'marketer'])()]
+    
+    def perform_create(self, serializer):
+        # Если клиент не передал явно тип и статус — ставим значения по умолчанию
+        if not self.request.data.get('type_name'):
+            try:
+                type_obj = ClientsApplicationType.objects.get(name='Обратный звонок')
+                serializer.validated_data['type'] = type_obj
+            except ClientsApplicationType.DoesNotExist:
+                raise ValidationError({'type': 'Тип "Обратный звонок" не найден'})
+
+        if not self.request.data.get('status_name'):
+            try:
+                status_obj = ClientsApplicationStatus.objects.get(name='Новая')
+                serializer.validated_data['status'] = status_obj
+            except:
+                raise ValidationError({'status': 'Статус "Новая" не найден'})
+        
+        serializer.save()
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'Заявка успешно создана'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({'message': 'Заявка успешно создана'}, status=status.HTTP_201_CREATED)
+
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

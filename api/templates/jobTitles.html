@@ -5,10 +5,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Статусы заявок - ИС Darwin</title>
+    <title>Должности - ИС Darwin</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
   </head>
-  
+
   <body>
 
     <div class="header">
@@ -21,11 +21,11 @@
 
     <div class="container">
       <div class="box">
-        <h2 class="textTitle">Статусы заявок</h2>
+        <h2 class="textTitle">Должности</h2>
         <div class="btnGroup">
-          <button id="btnAdd" class="btn">Добавить статус</button>
-          <button id="btnOpenEdit" class="btn">Изменить статус</button>
-          <button id="deleteSubmitBtn" class="btn btnAccentRed">Удалить статус</button>
+          <button id="btnAdd" class="btn">Добавить материал</button>
+          <button id="btnOpenEdit" class="btn">Изменить материал</button>
+          <button id="deleteSubmitBtn" class="btn btnAccentRed">Удалить материал</button>
           <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
         </div>
       </div>
@@ -33,16 +33,15 @@
 
     <div>
       <div class="container">
-        <h2 class="textTitle">Список статусов</h2>
+        <h2 class="textTitle">Список должностей</h2>
         <table class="table">
           <thead>
             <tr>
               <th>id</th>
               <th>name</th>
-              <th>description</th>
             </tr>
           </thead>
-          <tbody id="application-statuses-table-body">
+          <tbody id="jobTitles-table-body">
             <tr>
               <!-- сервер? -->
             </tr>
@@ -51,24 +50,22 @@
       </div>
     </div>
 
-     <div id="clientsApplicationsStatusesAddForm" class="modal hidden">
+    <div id="jobTitlesAddForm" class="modal hidden">
       <div class="box">
-        <h2 class="textTitle">Добавить статус</h2>
+        <h2 class="textTitle">Добавить должность</h2>
         <input type="text" id="addName" placeholder="Название" required />
-        <input type="text" id="addDescription" placeholder="Описание" required />
         <div class="btnGroup">
           <button type="submit" class="btn btnAccentSuccess">Добавить</button>
-          <button type="button" class="btn" onclick="closeModal()">Отмена</button>   
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>     
         </div>
       </div>
     </div>
 
-    <div id="clientsApplicationsStatusesChangeForm" class="modal hidden">
+    <div id="jobTitlesChangeForm" class="modal hidden">
       <div class="box">
-        <h2 class="textTitle">Изменить статус</h2>
+        <h2 class="textTitle">Изменить должность</h2>
         <input type="hidden" id="id" />
         <input type="text" id="editName" placeholder="Название" required />
-        <input type="text" id="editDescription" placeholder="Описание" required />
         <div class="btnGroup">
           <button type="submit" class="btn btnAccent">Изменить</button>
           <button type="button" class="btn" onclick="closeModal()">Отмена</button>
@@ -76,35 +73,35 @@
       </div>
     </div>
 
-    <div id="clientsApplicationsStatusesDeleteForm" class="modal hidden">
+    <div id="jobTitlesDeleteForm" class="modal hidden">
       <div class="box">
-        <h2 class="textTitle">Удалить статус</h2>
+        <h2 class="textTitle">Удалить должность</h2>
         <div class="forms">
-          <p>Название: <strong id="deleteStatusName"></strong></p>
+          <p>Название: <strong id="deleteJobName"></strong></p>
         </div>
         <div class="btnGroup">
           <button type="button" class="btn btnAccentRed" id="confirmDeleteBtn">Удалить</button>
-          <button type="button" class="btn" onclick="closeModal()">Отмена</button> 
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>          
         </div>
       </div>
     </div>
 
-    <div id="clientsApplicationsStatusesErrorModal" class="modal hidden">
+    <div id="jobTitlesErrorModal" class="modal hidden">
       <div class="modalBox">
         <p>Возникла ошибка. Уточните подробности у системного администратора</p>
         <button class="btn btnAccentRed" onclick="closeModal()">Закрыть</button>
       </div>
     </div>
 
-    <div id="clientsApplicationsStatusesSuccessModal" class="modal hidden">
+    <div id="jobTitlesSuccessModal" class="modal hidden">
       <div class="modalBox">
         <p>Успешно!</p>
         <button class="btn btnAccentSuccess" onclick="closeModal()">Закрыть</button>
       </div>
     </div>
 
-    <script src="{% static 'js/applicationsStatusesLogic.js' %}"></script>
-    <script src="{% static 'js/applicationsStatusesList.js' %}"></script>
+    <script src="{% static 'js/jobTitlesLogic.js' %}"></script>
+    <script src="{% static 'js/jobTitlesList.js' %}"></script>
   </body>
 
 </html>

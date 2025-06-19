@@ -9,6 +9,7 @@ function getCsrfToken() {
       return decodeURIComponent(cookie.substring(name.length + 1));
     }
   }
+  console.error("CSRF токен не найден в cookies!");
   return null;
 }
 
@@ -16,8 +17,8 @@ function getCsrfToken() {
 async function checkAuthStatus() {
   try {
     const response = await fetch('/api/check-login/', {
-      method: 'POST',
-      credentials: 'include'
+      method: 'GET',
+      credentials: 'include',
     });
     
     if (response.status === 403) {

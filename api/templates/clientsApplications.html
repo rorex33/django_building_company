@@ -23,8 +23,8 @@
       <div class="box">
         <h2 class="textTitle">Заявки клиентов</h2>
         <div class="btnGroup">
-          <button class="btn">Изменить заявку</button>
-          <button class="btn btnAccentRed">Удалить заявку</button>
+          <button id="btnOpenEdit" class="btn">Изменить заявку</button>
+          <button id="deleteSubmitBtn" class="btn btnAccentRed">Удалить заявку</button>
           <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
         </div>
       </div>
@@ -45,15 +45,68 @@
               <th>date</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="application-table-body">
             <tr>
-              <!-- сервер? -->
+              <!-- сервер -->
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
+    <div id="clientsApplicationsChangeForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Изменить заявку</h2>
+        <input type="hidden" id="id" />
+        <input type="text" id="fullName" placeholder="ФИО" required>
+        <input type="tel" id="phoneNumber" placeholder="Номер телефона" required>
+        <input type="text" id="description" placeholder="Описание" required>
+        <select id="typeId" name="typeId" required>
+          <option value="" disabled selected hidden>Тип заявки</option>
+          <!-- сервер? -->
+        </select>
+        <select id="statusId" name="statusId" required>
+          <option value="" disabled selected hidden>Статус заявки</option>
+          <!-- сервер? -->
+        </select>
+        <div class="btnGroup">
+          <button type="submit" class="btn btnAccent">Изменить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsDeleteForm" class="modal hidden">
+      <div class="box">
+        <h2 class="textTitle">Удалить заявку</h2>
+        <div class="forms">
+          <p>Клиент: <strong id="deleteAppName"></strong></p>
+          <p>Телефон: <strong id="deleteAppPhone"></strong></p>
+          <p>Тип заявки: <strong id="deleteAppType"></strong></p>
+        </div>
+        <div class="btnGroup">
+          <button type="button" class="btn btnAccentRed" id="confirmDeleteBtn">Удалить</button>
+          <button type="button" class="btn" onclick="closeModal()">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsErrorModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Возникла ошибка. Уточните подробности у системного администратора</p>
+        <button class="btn btnAccentRed" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <div id="clientsApplicationsSuccessModal" class="modal hidden">
+      <div class="modalBox">
+        <p>Успешно!</p>
+        <button class="btn btnAccentSuccess" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+
+    <script src="{% static 'js/applicationsList.js' %}"></script>
+    <script src="{% static 'js/applicationsDelUpd.js' %}"></script>
   </body>
 
 </html>

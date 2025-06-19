@@ -23,9 +23,6 @@
       <div class="box">
         <h2 class="textTitle">Роли ИС</h2>
         <div class="btnGroup">
-          <button class="btn">Добавить роль</button>
-          <button class="btn">Изменить роль</button>
-          <button class="btn btnAccentRed">Удалить роль</button>
           <a href="/pages/dashboard/" class="btn btnAccent">Назад</a>
         </div>
       </div>
@@ -42,7 +39,7 @@
               <th>description</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="roles-table-body">
             <tr>
               <!-- сервер? -->
             </tr>
@@ -51,6 +48,7 @@
       </div>
     </div>
 
+    <script src="{% static 'js/rolesList.js' %}"></script>
   </body>
 
 </html>
